@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>企业信用信息查询</title>
+    <link rel="stylesheet" href="/company.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <header class="header">
+          <div>
+            <p class="eyebrow">企业信用信息</p>
+            <h1>上传公司名单，生成查询结果</h1>
+          </div>
+          <a class="template-link" href="/company-list-template.xlsx" download>下载模板</a>
+        </header>
+
+        <form id="upload-form" class="upload-box">
+          <label class="file-field">
+            <span>Excel / CSV 文件</span>
+            <input id="company-file" name="company_file" type="file" accept=".xlsx,.xls,.xlsm,.csv" required />
+          </label>
+          <div class="button-stack">
+            <button id="manual-button" type="button" class="secondary">手动打开后采集</button>
+            <button id="start-button" type="submit">自动查询</button>
+          </div>
+        </form>
+
+        <section class="status-card">
+          <div class="status-line">
+            <span id="status-dot" class="dot"></span>
+            <strong id="status-title">等待上传</strong>
+          </div>
+          <p id="status-message">请选择已经整理好的公司名单文件。</p>
+          <dl id="job-meta" class="job-meta" hidden>
+            <div>
+              <dt>任务</dt>
+              <dd id="job-id">-</dd>
+            </div>
+            <div>
+              <dt>更新时间</dt>
+              <dd id="job-updated">-</dd>
+            </div>
+          </dl>
+          <div id="actions" class="actions" hidden>
+            <button id="continue-button" type="button" class="secondary">我已处理，继续查询</button>
+          </div>
+          <div id="downloads" class="downloads" hidden>
+            <a id="download-xlsx" class="button-link" href="#">下载 Excel 结果</a>
+            <a id="download-csv" class="button-link secondary-link" href="#">下载 CSV 结果</a>
+          </div>
+          <section id="manual-panel" class="manual-panel" hidden>
+            <h2>普通 Chrome 采集</h2>
+            <ol>
+              <li>把下面的“采集当前企业页”拖到普通 Chrome 的书签栏，或复制书签脚本后新建书签。</li>
+              <li>在普通 Chrome 里打开公示系统，登录并进入某家企业详情页。</li>
+              <li>点击书签栏里的“采集当前企业页”，本地页面会自动更新结果。</li>
+            </ol>
+            <div class="bookmark-row">
+              <a id="bookmarklet-link" class="button-link secondary-link" href="#">采集当前企业页</a>
+              <button id="copy-bookmarklet" type="button" class="secondary">复制书签脚本</button>
+            </div>
+            <p id="manual-count" class="manual-count"></p>
+          </section>
+          <details id="log-panel" class="log-panel" hidden>
+            <summary>查看执行日志</summary>
+            <pre id="job-log"></pre>
+          </details>
+        </section>
+
+        <section class="notes">
+          <p>查询时会打开浏览器窗口。遇到登录、实名认证、验证码或结果不确定时，请先在浏览器里处理，再回到这个页面点击继续。</p>
+          <p>工具只提取官网公开显示的信息，不会绕过人机验证，也不会抓取非公开手机号。</p>
+        </section>
+      </section>
+    </main>
+
+    <script src="/company.js"></script>
+  </body>
+</html>

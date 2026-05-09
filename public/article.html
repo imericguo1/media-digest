@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>中文阅读页</title>
+    <style>
+      :root {
+        --bg: #f4f4f1;
+        --text: #1d1f1f;
+        --muted: #626866;
+        --accent: #0f766e;
+        --border: rgba(30, 36, 34, 0.12);
+      }
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      }
+      main {
+        width: min(860px, calc(100% - 34px));
+        margin: 0 auto;
+        padding: 34px 0 72px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 16px 42px rgba(32, 39, 37, 0.08);
+        padding: 28px;
+      }
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 760;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        line-height: 1.16;
+      }
+      .meta,
+      .summary {
+        color: var(--muted);
+      }
+      .meta {
+        margin: 14px 0 0;
+        word-break: break-all;
+      }
+      .summary {
+        margin: 22px 0;
+        padding: 16px;
+        border-left: 4px solid var(--accent);
+        background: #f8faf9;
+        line-height: 1.72;
+      }
+      .body p {
+        margin: 0 0 18px;
+        font-size: 1.05rem;
+        line-height: 1.86;
+      }
+      .source-block {
+        margin-top: 34px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+      .source-block h2 {
+        margin: 0 0 16px;
+        font-size: 1.25rem;
+      }
+      .source-block p {
+        margin: 0 0 16px;
+        color: #374151;
+        font-size: 0.98rem;
+        line-height: 1.78;
+      }
+      a {
+        color: var(--accent);
+      }
+      .status {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .error {
+        color: #c2252d;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <article id="article" class="card">
+        <p class="eyebrow">Translated reader</p>
+        <h1>正在准备中文阅读页</h1>
+        <p class="status">正在抓取原网页并翻译成中文。</p>
+      </article>
+    </main>
+    <script>
+      const article = document.getElementById("article");
+      const params = new URLSearchParams(window.location.search);
+      const jobId = params.get("job");
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[char]);
+      }
+
+      function render(job) {
+        if (job.status === "complete") {
+          document.title = job.title_zh || "中文阅读页";
+          article.innerHTML = `
+            <p class="eyebrow">Translated reader</p>
+            <h1>${escapeHtml(job.title_zh || job.source_title || "中文阅读页")}</h1>
+            <p class="meta"><a href="${escapeHtml(job.url)}" target="_blank" rel="noreferrer">查看原文</a></p>
+            ${job.summary_zh ? `<section class="summary">${escapeHtml(job.summary_zh)}</section>` : ""}
+            <section class="body">
+              ${(job.body_zh || []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            </section>
+            <section class="source-block">
+              <h2>英文原文</h2>
+              ${(job.source_paragraphs || []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            </section>
+          `;
+          return true;
+        }
+        if (job.status === "failed") {
+          article.innerHTML = `
+            <p class="eyebrow">Translated reader</p>
+            <h1>翻译没有完成</h1>
+            <p class="status error">${escapeHtml(job.error || "请稍后重试。")}</p>
+            ${job.url ? `<p class="meta"><a href="${escapeHtml(job.url)}" target="_blank" rel="noreferrer">打开原文</a></p>` : ""}
+          `;
+          return true;
+        }
+        const label = job.status === "fetching" ? "正在抓取原网页" : "正在翻译正文";
+        article.innerHTML = `
+          <p class="eyebrow">Translated reader</p>
+          <h1>${escapeHtml(job.source_title || job.title || "正在准备中文阅读页")}</h1>
+          <p class="status">${label}，完成后会自动显示。</p>
+          ${job.source_excerpt ? `<section class="summary">${escapeHtml(job.source_excerpt)}...</section>` : ""}
+        `;
+        return false;
+      }
+
+      async function poll() {
+        if (!jobId) {
+          article.innerHTML = '<h1>缺少阅读任务</h1><p class="status error">请从新闻卡片重新打开。</p>';
+          return;
+        }
+        try {
+          const response = await fetch(`/api/article/jobs/${encodeURIComponent(jobId)}`);
+          const job = await response.json();
+          if (!response.ok) throw new Error(job.error || "读取任务失败");
+          const done = render(job);
+          if (!done) window.setTimeout(poll, 1600);
+        } catch (error) {
+          article.innerHTML = `<h1>读取失败</h1><p class="status error">${escapeHtml(error.message)}</p>`;
+        }
+      }
+
+      poll();
+    </script>
+  </body>
+</html>

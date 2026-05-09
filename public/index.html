@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Digest</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <a class="brand-mark" href="/" aria-label="Media Digest 首页">
+          <span class="mark-window">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </a>
+        <div id="service-state" class="service-state">本地服务检查中</div>
+      </header>
+
+      <section class="workspace" aria-label="媒体信息流工作区">
+        <aside class="control-panel">
+          <form id="digest-form" class="control-stack">
+            <div class="panel-heading">
+              <div class="title-graphic" aria-label="媒体信息流">
+                <span class="title-bars">
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </span>
+                <span class="title-dot"></span>
+              </div>
+            </div>
+
+            <label class="field">
+              <span>时间范围</span>
+              <select id="hours-select" name="hours">
+                <option value="12">最近 12 小时</option>
+                <option value="24" selected>最近 24 小时</option>
+                <option value="48">最近 48 小时</option>
+                <option value="72">最近 3 天</option>
+              </select>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="auto-refresh" type="checkbox" checked />
+              <span>打开页面后自动抓取，并每 24 小时更新</span>
+            </label>
+
+            <section id="sidebar-summary" class="sidebar-summary empty-sidebar">
+              <p class="sidebar-empty">抓取后会在这里显示简报概览。</p>
+            </section>
+
+            <details class="source-section">
+              <summary>
+                <h2>媒体源</h2>
+                <span id="source-count-label">默认全选</span>
+              </summary>
+              <button id="select-all-button" type="button" class="secondary compact-button">全选 / 取消</button>
+              <div id="source-list" class="source-list"></div>
+            </details>
+
+            <details class="advanced">
+              <summary>DeepSeek 汇总</summary>
+              <label class="field">
+                <span>API Key</span>
+                <input id="api-key" name="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+              </label>
+              <label class="checkbox-row">
+                <input id="remember-key" type="checkbox" />
+                <span>在本机浏览器记住 Key</span>
+              </label>
+              <label class="field">
+                <span>模型</span>
+                <select id="model-select" name="model">
+                  <option value="deepseek-v4-flash">deepseek-v4-flash</option>
+                  <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+                  <option value="deepseek-chat">deepseek-chat</option>
+                  <option value="deepseek-reasoner">deepseek-reasoner</option>
+                </select>
+              </label>
+            </details>
+
+            <div class="action-row">
+              <button id="refresh-button" type="submit">抓取并汇总</button>
+              <button id="export-button" type="button" class="secondary" disabled>导出 Markdown</button>
+            </div>
+          </form>
+        </aside>
+
+        <section class="results-shell">
+          <div class="results-toolbar">
+            <div>
+              <p class="eyebrow">Brief</p>
+              <h2>今日简报</h2>
+            </div>
+            <div id="status" class="status"></div>
+          </div>
+
+          <section class="feed-section">
+            <div class="section-heading">
+              <h2>报道列表</h2>
+              <div id="feed-count" class="meta"></div>
+            </div>
+            <div id="feed-list" class="feed-list"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <template id="source-template">
+      <label class="source-item">
+        <input type="checkbox" />
+        <span class="source-name"></span>
+        <span class="source-region"></span>
+      </label>
+    </template>
+
+    <template id="feed-template">
+      <article class="feed-card">
+        <a class="feed-image-link" target="_blank" rel="noreferrer" aria-hidden="true">
+          <img class="feed-image" alt="" loading="lazy" />
+          <span class="image-badge"></span>
+        </a>
+        <div class="feed-body">
+          <div class="feed-meta"></div>
+          <h3><a target="_blank" rel="noreferrer"></a></h3>
+          <p></p>
+          <button type="button" class="expand-toggle">展开</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

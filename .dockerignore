@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.pyc
+.DS_Store
+tmp
+log
+node_modules
+company_credit_workflow/output
+company_credit_workflow/web_jobs

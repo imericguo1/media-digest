@@ -1,0 +1,8 @@
+.codex-tools/
+__pycache__/
+*.pyc
+.DS_Store
+company_credit_workflow/output/
+company_credit_workflow/web_jobs/
+tmp/
+log/

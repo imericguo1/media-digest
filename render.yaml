@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: media-digest
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: BIND_ADDRESS
+        value: 0.0.0.0
+      - key: PORT
+        value: 4567
+      - key: APP_PASSWORD
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
